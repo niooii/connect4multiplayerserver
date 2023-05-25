@@ -2,16 +2,19 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class Player {
     public Socket sock;
     public String name;
     public int ID;
+    public int challengeCount;
     public int inGameID;
     public boolean isAlive = true;
     DataInputStream din;
     DataOutputStream dout;
     public Player LinkedPlayer;
+    ArrayList<Player> challengers = new ArrayList<>();
     public Player(Socket sock, String name, int ID) throws IOException {
         this.sock = sock;
         this.name = name;
@@ -45,7 +48,31 @@ public class Player {
         LinkedPlayer.send(formatMoveData(inGameID, col));
     }
 
+    public void sendMoveToSelf(int col) throws IOException {
+        send(formatMoveData(inGameID, col));
+    }
+
     public String formatMoveData(int playerInGameID, int column){
-        return ID + "|" + inGameID + "|" + column;
+        return  "MOV:" + inGameID + "|" + column;
+    }
+
+    public void addChallenge(Player challenger){
+        challengers.add(challenger);
+        System.out.println(name);
+        //FIX BUG
+        System.out.println(challengers);
+        challengeCount = challengers.size();
+    }
+    public boolean acceptChallenge(Player player){
+        if(challengers.contains(player)){
+            for(Player x : challengers){
+                if(x.ID == player.ID){
+                    LinkPlayers(player);
+                    System.out.println("started game between " + this.name + " and " + player.name + ".") ;
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
