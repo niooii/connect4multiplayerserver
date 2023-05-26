@@ -72,12 +72,12 @@ import java.util.HashMap;
                         return;
                     }
                     if((playertemp = findPlayerByID(idtc)) == null){
-                        p.send("Could not find player with id " + idtc + "...");
+                        p.send("Could not find player with uid " + idtc + "...");
                     } else {
                         playertemp.addChallenge(p);
-                        p.send("Challenge sent to player " + playertemp.name + "!\n");
+                        p.send("Challenge sent to " + playertemp.name + "!\n");
                         playertemp.send("\nYou have " + playertemp.challengers.size() + " new challenge request(s).\n" +
-                                "Type \"VIEW\" to view them.");
+                                "Type \"VIEW\" to view them.\n");
                         //implement later
                     }
                     ID = tempID;
@@ -190,7 +190,7 @@ import java.util.HashMap;
                 for(Player p : p.challengers){
                     sendstr.append("PLAYER: ").append(p.name).append("\nUID: ").append(p.ID).append("\nIn game: ").append(p.LinkedPlayer != null).append("\n");
                 }
-                sendstr.append("\nUse \"ACCEPT [id]\" to accept a challenge request.");
+                sendstr.append("\nUse \"ACCEPT [id]\" to accept a challenge request.\n");
                 p.send(sendstr.toString());
             }
         }

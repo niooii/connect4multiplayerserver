@@ -82,7 +82,7 @@ public class Player {
     //only call this when someone exits the program.
     public void abortGame() throws IOException {
         if(LinkedPlayer != null){
-            LinkedPlayer.send("GAME_ABORTED");
+            LinkedPlayer.send("GAME_ABORTED|PLAYER_DISCONNECT");
             LinkedPlayer.LinkedPlayer = null;
             System.out.println("terminating game...");
         }
