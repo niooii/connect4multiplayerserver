@@ -162,7 +162,7 @@ import java.util.HashMap;
             }
             public void handleError(String errormsg) throws IOException {
                 if(errormsg.equals("UNINITIALIZED")){
-                    p.send("Your opponent has not started this game!");
+                    p.LinkedPlayer.send("Your opponent has not started this game!");
                 }
             }
             public void sendAllActivePlayers() throws IOException {
