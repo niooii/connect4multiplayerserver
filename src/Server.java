@@ -132,7 +132,11 @@ import java.util.HashMap;
                     return;
                 } else if(str.startsWith("ERROR")){
                     String error = str.substring(str.indexOf("|") + 1);
+                    p.successful = false;
                     handleError(error);
+                    return;
+                } else if(str.startsWith("SUCCESS")){
+                    p.successful = true;
                     return;
                 }
 
@@ -143,8 +147,14 @@ import java.util.HashMap;
                     if (movingPlayer.canMove) {
                         int col = Integer.parseInt(str.substring(str.indexOf("|") + 1));
                         movingPlayer.LinkedPlayer.send(String.valueOf(col));
-                        p.sendMoveToLinkedPlayer(col);
                         p.sendMoveToSelf(col);
+                        while(!p.LinkedPlayer.successful && p.LinkedPlayer != null){
+
+                        }
+                        if(p.LinkedPlayer == null){
+                            return;
+                        }
+                        p.sendMoveToLinkedPlayer(col);
                         movingPlayer.canMove = false;
                         movingPlayer.LinkedPlayer.canMove = true;
                     } else {
