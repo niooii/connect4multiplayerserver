@@ -14,9 +14,18 @@ import java.util.HashMap;
         public class ConnectionHandler extends Thread {
             public Socket s;
             public Player p;
+            int ID;
+            DataInputStream din;
+            String name;
             public void run() {
                 System.out.println("New connection!");
                 try {
+                    din=new DataInputStream(s.getInputStream());
+                    name = din.readUTF();
+                    System.out.println("user " + ++IDIncrementer + " registered as " + name + ".");
+                    ID = IDIncrementer;
+                    p = new Player(s, name, ID);
+                    players.add(p);
                     mainLoop();
                 } catch (IOException e) {
                     if(p != null){
@@ -37,20 +46,13 @@ import java.util.HashMap;
                 this.s = s;
             }
             public void mainLoop() throws IOException {
-                DataInputStream din=new DataInputStream(s.getInputStream());
-                String name = din.readUTF();
-                System.out.println("user " + ++ID + " registered as " + name + ".");
-                p = new Player(s, name, ID);
-                players.add(p);
-                p.send("PLAYER: " + p.name + "\nRun \"list\" to view all active players." +
-                        "\nRun \"challenge [uid]\" to send a challenge." +
-                        "\nRun \"view\" to view all incoming challenges." +
-                        "\nRun \"accept [uid]\" to accept a challenge and join a game.");
+                sendHelpMsg();
                 String str="";
                 while(true){
                     str=din.readUTF();
                     System.out.println(str);
                     processSocketInput(str);
+                    System.out.println(ID);
                     //add new elseif for VIEW command
                 }
             }
@@ -61,6 +63,7 @@ import java.util.HashMap;
                 } else if(str.substring(str.indexOf("|") + 1).toLowerCase().startsWith("list")){
                     sendAllActivePlayers();
                 } else if(str.toLowerCase().startsWith("challenge")){
+                    int tempID = ID;
                     Player playertemp;
                     String idToChallenge = str.substring(str.indexOf("|") + 1);
                     int idtc = Integer.parseInt(idToChallenge);
@@ -77,6 +80,7 @@ import java.util.HashMap;
                                 "Type \"VIEW\" to view them.");
                         //implement later
                     }
+                    ID = tempID;
                 } else if(str.toLowerCase().startsWith("view")){
                     sendAllChallenges();
                 } else if(str.toLowerCase().startsWith("accept")){
@@ -86,7 +90,8 @@ import java.util.HashMap;
                     if((opponent = findPlayerByID(idta)) == null){
                         p.send("could not find player with id " + idta + "...");
                     } else {
-                        if(p.acceptChallenge(opponent)){
+                        int status;
+                        if((status = p.acceptChallenge(opponent)) == 0){
                             p.send("\nAccepted " + opponent.name + "'s challenge! \nPress [enter] to continue. \n");
                             p.send("SETOPPONENT|" + opponent.name);
                             p.send("SETIGID|" + p.inGameID);
@@ -95,8 +100,10 @@ import java.util.HashMap;
                             opponent.send("SETOPPONENT|" + p.name);
                             opponent.send("SETIGID|" + opponent.inGameID);
                             opponent.send("SETNOTIDLE");
-                        } else {
+                        } else if(status == -1){
                             p.send("You do not have a challenge request from this player!");
+                        } else{
+                            p.send("This player is currently in a game!");
                         }
                         //implement later
                     }
@@ -160,7 +167,7 @@ import java.util.HashMap;
                     if(p.ID == this.p.ID){
                         sendstr.append("\n(YOU)\n");
                     } else {
-                        sendstr.append("\nNAME: ").append(p.name).append("\nUID: ").append(p.ID).append("\nIn game: ").append(p.LinkedPlayer != null).append("\n");
+                        sendstr.append("\nPLAYER: ").append(p.name).append("\nUID: ").append(p.ID).append("\nIn game: ").append(p.LinkedPlayer != null).append("\n");
                     }
                 }
                 if(p.challengers.size() != 0){
@@ -181,7 +188,7 @@ import java.util.HashMap;
                 sendstr.append("INCOMING CHALLENGES\n");
                 sendstr.append("------------------------------------------\n\n");
                 for(Player p : p.challengers){
-                    sendstr.append("NAME: ").append(p.name).append("\nUID: ").append(p.ID).append("\nIn game: ").append(p.LinkedPlayer != null).append("\n");
+                    sendstr.append("PLAYER: ").append(p.name).append("\nUID: ").append(p.ID).append("\nIn game: ").append(p.LinkedPlayer != null).append("\n");
                 }
                 sendstr.append("\nUse \"ACCEPT [id]\" to accept a challenge request.");
                 p.send(sendstr.toString());
@@ -189,7 +196,7 @@ import java.util.HashMap;
         }
     static ArrayList<Player> players = new ArrayList<>();
     public HashMap<Integer, Integer> linkedPlayers = new HashMap<>();
-    static int ID = 0;
+    static int IDIncrementer = 0;
     public Server() throws IOException {
         ServerSocket ss=new ServerSocket(8811);
         System.out.println("Ready to accept connections...");

@@ -21,8 +21,8 @@ public class Player {
         this.ID = ID;
         din=new DataInputStream(sock.getInputStream());
         dout=new DataOutputStream(sock.getOutputStream());
-        dout.writeUTF("Set user name to: " + name);
-        dout.flush();
+//        dout.writeUTF("Set user name to: " + name);
+//        dout.flush();
         //send uid to client
         dout.writeUTF(String.valueOf(ID));
         dout.flush();
@@ -64,17 +64,19 @@ public class Player {
         //FIX BUG
         //nevermind no bug
     }
-    public boolean acceptChallenge(Player otherPlayer){
-            for(Player x : challengers){
-                System.out.println("checking if " + x.ID + " == " + otherPlayer.ID);
-                if(x.ID == otherPlayer.ID){
-                    LinkPlayers(x);
-                    System.out.println("started game between " + this.name + " and " + x.name + ".") ;
-                    challengers.remove(x);
-                    return true;
-                }
+    public int acceptChallenge(Player otherPlayer){
+        if(otherPlayer.LinkedPlayer != null)
+            return -2;
+        for(Player x : challengers){
+            System.out.println("checking if " + x.ID + " == " + otherPlayer.ID);
+            if(x.ID == otherPlayer.ID){
+                LinkPlayers(x);
+                System.out.println("started game between " + this.name + " and " + x.name + ".") ;
+                challengers.remove(x);
+                return 0;
             }
-        return false;
+        }
+        return -1;
     }
 
     //only call this when someone exits the program.
