@@ -8,9 +8,9 @@ public class Player {
     public Socket sock;
     public String name;
     public int ID;
-    public int challengeCount;
     public int inGameID;
     public boolean isAlive = true;
+    public boolean canMove = false;
     DataInputStream din;
     DataOutputStream dout;
     public Player LinkedPlayer;
@@ -23,6 +23,7 @@ public class Player {
         dout=new DataOutputStream(sock.getOutputStream());
         dout.writeUTF("Set user name to: " + name);
         dout.flush();
+        //send uid to client
         dout.writeUTF(String.valueOf(ID));
         dout.flush();
     }
@@ -37,8 +38,9 @@ public class Player {
         if(this.LinkedPlayer == null){
             this.LinkedPlayer = player;
             LinkedPlayer.LinkedPlayer = this;
-            LinkedPlayer.inGameID = 1;
             this.inGameID = 0;
+            LinkedPlayer.inGameID = 1;
+            this.canMove = true;
             return true;
         }
         return false;
@@ -60,19 +62,34 @@ public class Player {
         challengers.add(challenger);
         System.out.println(name);
         //FIX BUG
-        System.out.println(challengers);
-        challengeCount = challengers.size();
+        //nevermind no bug
     }
-    public boolean acceptChallenge(Player player){
-        if(challengers.contains(player)){
+    public boolean acceptChallenge(Player otherPlayer){
             for(Player x : challengers){
-                if(x.ID == player.ID){
-                    LinkPlayers(player);
-                    System.out.println("started game between " + this.name + " and " + player.name + ".") ;
+                System.out.println("checking if " + x.ID + " == " + otherPlayer.ID);
+                if(x.ID == otherPlayer.ID){
+                    LinkPlayers(x);
+                    System.out.println("started game between " + this.name + " and " + x.name + ".") ;
+                    challengers.remove(x);
                     return true;
                 }
             }
-        }
         return false;
+    }
+
+    //only call this when someone exits the program.
+    public void abortGame() throws IOException {
+        if(LinkedPlayer != null){
+            LinkedPlayer.send("GAME_ABORTED");
+            LinkedPlayer.LinkedPlayer = null;
+            System.out.println("terminating game...");
+        }
+    }
+
+    public void finishGame(){
+        if(LinkedPlayer != null){
+            LinkedPlayer.LinkedPlayer = null;
+            LinkedPlayer = null;
+        }
     }
 }
