@@ -1,13 +1,7 @@
-
-// Server2 class that
-// receives data and sends data
-
 import java.net.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-
 
     public class Server {
         static ArrayList<ConnectionHandler> connections = new ArrayList<>();
@@ -67,6 +61,10 @@ import java.util.HashMap;
                     Player playertemp;
                     String idToChallenge = str.substring(str.indexOf("|") + 1);
                     int idtc = Integer.parseInt(idToChallenge);
+                    if(idtc == p.ID){
+                        p.send("\nYou cannot challenge yourself!\n");
+                        return;
+                    }
                     if(idtc == p.ID){
                         p.send("\nYou cannot challenge yourself!\n");
                         return;
@@ -132,6 +130,10 @@ import java.util.HashMap;
                     p.LinkedPlayer.send(wonmsg);
                     p.finishGame();
                     return;
+                } else if(str.startsWith("ERROR")){
+                    String error = str.substring(str.indexOf("|") + 1);
+                    handleError(error);
+                    return;
                 }
 
                 System.out.println("[DEBUG] " + str);
@@ -146,7 +148,7 @@ import java.util.HashMap;
                         movingPlayer.canMove = false;
                         movingPlayer.LinkedPlayer.canMove = true;
                     } else {
-                        movingPlayer.send("it aint ur turn calm down");
+                        movingPlayer.send("It's not your turn!");
                     }
                 } catch(NumberFormatException e){
                     movingPlayer.send("Something went wrong!");
@@ -157,6 +159,11 @@ import java.util.HashMap;
                     if(id==p.ID)
                         return p;
                 return null;
+            }
+            public void handleError(String errormsg) throws IOException {
+                if(errormsg.equals("UNINITIALIZED")){
+                    p.send("Your opponent has not started this game!");
+                }
             }
             public void sendAllActivePlayers() throws IOException {
                 StringBuilder sendstr = new StringBuilder();
