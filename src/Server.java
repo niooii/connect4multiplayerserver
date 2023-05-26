@@ -68,14 +68,14 @@ import java.util.HashMap;
                     String idToChallenge = str.substring(str.indexOf("|") + 1);
                     int idtc = Integer.parseInt(idToChallenge);
                     if(idtc == p.ID){
-                        p.send("You cannot challenge yourself!");
+                        p.send("\nYou cannot challenge yourself!\n");
                         return;
                     }
                     if((playertemp = findPlayerByID(idtc)) == null){
-                        p.send("Could not find player with uid " + idtc + "...");
+                        p.send("\nCould not find player with uid " + idtc + "...\n");
                     } else {
                         playertemp.addChallenge(p);
-                        p.send("Challenge sent to " + playertemp.name + "!\n");
+                        p.send("\nChallenge sent to " + playertemp.name + "!\n");
                         playertemp.send("\nYou have " + playertemp.challengers.size() + " new challenge request(s).\n" +
                                 "Type \"VIEW\" to view them.\n");
                         //implement later
@@ -88,7 +88,7 @@ import java.util.HashMap;
                     String idToAccept = str.substring(str.indexOf("|") + 1);
                     int idta = Integer.parseInt(idToAccept);
                     if((opponent = findPlayerByID(idta)) == null){
-                        p.send("could not find player with id " + idta + "...");
+                        p.send("\ncould not find player with id " + idta + "...\n");
                     } else {
                         int status;
                         if((status = p.acceptChallenge(opponent)) == 0){
@@ -101,9 +101,9 @@ import java.util.HashMap;
                             opponent.send("SETIGID|" + opponent.inGameID);
                             opponent.send("SETNOTIDLE");
                         } else if(status == -1){
-                            p.send("You do not have a challenge request from this player!");
+                            p.send("\nYou do not have a challenge request from this player!\n");
                         } else{
-                            p.send("This player is currently in a game!");
+                            p.send("\nThis player is currently in a game!\n");
                         }
                         //implement later
                     }
