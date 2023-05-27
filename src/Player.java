@@ -11,7 +11,7 @@ public class Player {
     public int inGameID;
     public boolean isAlive = true;
     public boolean canMove = false;
-    public boolean successful = false;
+    public boolean gridInitialized = false;
     DataInputStream din;
     DataOutputStream dout;
     public Player LinkedPlayer;

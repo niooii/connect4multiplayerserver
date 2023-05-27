@@ -132,11 +132,15 @@ import java.util.HashMap;
                     return;
                 } else if(str.startsWith("ERROR")){
                     String error = str.substring(str.indexOf("|") + 1);
-                    p.successful = false;
                     handleError(error);
                     return;
                 } else if(str.startsWith("SUCCESS")){
-                    p.successful = true;
+                    p.gridInitialized = true;
+                    System.out.println("player " + p.name + "'s grid has been initialized.");
+                    return;
+                }
+                if(!p.LinkedPlayer.gridInitialized){
+                    p.send("Your opponent has not started this game yet!");
                     return;
                 }
 
@@ -148,12 +152,6 @@ import java.util.HashMap;
                         int col = Integer.parseInt(str.substring(str.indexOf("|") + 1));
                         movingPlayer.LinkedPlayer.send(String.valueOf(col));
                         p.sendMoveToSelf(col);
-                        while(!p.LinkedPlayer.successful && p.LinkedPlayer != null){
-
-                        }
-                        if(p.LinkedPlayer == null){
-                            return;
-                        }
                         p.sendMoveToLinkedPlayer(col);
                         movingPlayer.canMove = false;
                         movingPlayer.LinkedPlayer.canMove = true;
