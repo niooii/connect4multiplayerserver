@@ -2,8 +2,9 @@ import java.net.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
-    public class Server {
+public class Server {
         static ArrayList<ConnectionHandler> connections = new ArrayList<>();
         public class ConnectionHandler extends Thread {
             public Socket s;
@@ -64,9 +65,8 @@ import java.util.HashMap;
                     if(idtc == p.ID){
                         p.send("\nYou cannot challenge yourself!\n");
                         return;
-                    }
-                    if(idtc == p.ID){
-                        p.send("\nYou cannot challenge yourself!\n");
+                    } else if(challengeListContainsID(idtc)){
+                        p.send("\nYou already have an outgoing challenge to this player!\n");
                         return;
                     }
                     if((playertemp = findPlayerByID(idtc)) == null){
@@ -108,6 +108,14 @@ import java.util.HashMap;
                 } else{
                     sendHelpMsg();
                 }
+            }
+            public boolean challengeListContainsID(int id){
+                Iterator<Player> it = p.challengers.iterator();
+                while(it.hasNext()){
+                    if(it.next().ID == id)
+                        return true;
+                }
+                return false;
             }
 
             public void sendHelpMsg() throws IOException {
