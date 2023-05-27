@@ -110,9 +110,8 @@ public class Server {
                 }
             }
             public boolean challengeListContainsID(int id){
-                Iterator<Player> it = p.challengers.iterator();
-                while(it.hasNext()){
-                    if(it.next().ID == id)
+                for (Player player : findPlayerByID(id).challengers) {
+                    if (p.ID == player.ID)
                         return true;
                 }
                 return false;
@@ -211,7 +210,7 @@ public class Server {
                 sendstr.append("INCOMING CHALLENGES\n");
                 sendstr.append("------------------------------------------\n\n");
                 for(Player p : p.challengers){
-                    sendstr.append("PLAYER: ").append(p.name).append("\nUID: ").append(p.ID).append("\nIn game: ").append(p.LinkedPlayer != null).append("\n");
+                    sendstr.append("\nPLAYER: ").append(p.name).append("\nUID: ").append(p.ID).append("\nIn game: ").append(p.LinkedPlayer != null).append("\n");
                 }
                 sendstr.append("\nUse \"ACCEPT [id]\" to accept a challenge request.\n");
                 p.send(sendstr.toString());
