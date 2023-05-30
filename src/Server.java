@@ -127,6 +127,7 @@ public class Server {
             public void HandleGame(String str) throws IOException {
 
                 if(str.toLowerCase().startsWith("full")){
+                    p.LinkedPlayer.send("It's a tie!");
                     p.finishGame();
                     p.send("It's a tie!");
                     return;
